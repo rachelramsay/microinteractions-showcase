@@ -1,51 +1,22 @@
 /* ============================================================
    Microinteractions Showcase — shared theme & layout
    ============================================================ */
+/* Color, radius & spacing tokens are the single source of truth, exported
+   from the Figma "Microinteractions — Design System". Edit tokens in Figma
+   and re-export to tokens.generated.css — do not redefine those vars here. */
+@import "tokens.generated.css";
+
 :root {
-  --bg: #0c0e14;
-  --bg-elev: #141823;
-  --bg-elev-2: #1c2130;
-  --border: #262c3d;
-  --text: #e7eaf3;
-  --text-dim: #9aa3b8;
-  --text-faint: #5d6479;
-  --accent: #6c8cff;
-  --accent-2: #b06cff;
-  --success: #36d399;
-  --danger: #ff6b81;
-  --warn: #ffd166;
-  --radius: 14px;
+  /* Effects & translucency — not part of the Figma variable export */
   --shadow: 0 10px 30px -12px rgba(0,0,0,0.7);
   --sidebar-bg: rgba(10,12,18,0.6);
-  --border-hover: #34405c;
-  --code-text: #cdd4e6;
-  --heading-from: #ffffff;
-  --syntax-str: #36d399;
-  --syntax-fn: #6c8cff;
   font-synthesis: none;
 }
 
-/* ---------- Light theme ---------- */
+/* ---------- Light theme (effects only; colors come from tokens.generated.css) ---------- */
 html[data-theme="light"] {
-  --bg: #f4f6fb;
-  --bg-elev: #ffffff;
-  --bg-elev-2: #eaeef6;
-  --border: #dce1ec;
-  --text: #1a1f2e;
-  --text-dim: #54607a;
-  --text-faint: #8b94a9;
-  --accent: #4f6dff;
-  --accent-2: #9a55ff;
-  --success: #15a86b;
-  --danger: #e23b54;
-  --warn: #c98a00;
   --shadow: 0 10px 30px -12px rgba(30,45,80,0.25);
   --sidebar-bg: rgba(255,255,255,0.72);
-  --border-hover: #c2c9d8;
-  --code-text: #2b3245;
-  --heading-from: #161b29;
-  --syntax-str: #0a9d63;
-  --syntax-fn: #3a5bff;
 }
 
 * { box-sizing: border-box; }
