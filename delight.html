@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>08 · Delight — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+
+  .stage { position: relative; width: 100%; min-height: 150px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-elev); overflow: hidden; display: grid; place-items: center; }
+
+  /* ---- Cursor follower ---- */
+  .cursor-stage { cursor: none; }
+  .cursor-stage .hint { color: var(--text-faint); font-size: 13px; pointer-events: none; }
+  .follower { position: absolute; top: 0; left: 0; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--accent), var(--accent-2)); pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0 20px -2px var(--accent); }
+  .follower--css { transition: left .12s ease-out, top .12s ease-out; }
+
+  /* ---- Confetti ---- */
+  .confetti { position: absolute; width: 9px; height: 9px; border-radius: 2px; pointer-events: none; will-change: transform; }
+
+  /* ---- Magnetic button ---- */
+  .mag-btn { background: var(--accent); color: #fff; border: none; border-radius: 14px; padding: 14px 26px; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .mag-btn--css { transition: transform .2s ease, box-shadow .2s ease; }
+  .mag-btn--css:hover { transform: scale(1.06); box-shadow: 0 12px 26px -10px rgba(108,140,255,0.8); }
+
+  /* ---- Empty state ---- */
+  .empty { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+  .empty .glyph-box { width: 64px; height: 64px; border-radius: 18px; background: var(--bg-elev-2); border: 1px solid var(--border); display: grid; place-items: center; font-size: 30px; }
+  .empty .et { font-weight: 600; font-size: 15px; }
+  .empty .es { font-size: 13px; color: var(--text-dim); }
+  .empty--css .glyph-box { animation: float 2.6s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html" class="active"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 08</span>
+    <h1>Delight</h1>
+    <p class="lede">The optional flourishes — used sparingly, they’re what people remember. This is where a motion library really pulls ahead of plain CSS. Plain on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. CURSOR FOLLOWER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Cursor follower</h2>
+        <p>A dot trails the pointer. Move your mouse inside each box.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS lag</span>
+          <div class="stage cursor-stage" id="curCss">
+            <span class="hint">move inside</span>
+            <div class="follower follower--css"></div>
+          </div>
+          <p class="pane__note">JS sets x/y; a CSS transition creates the trailing lag.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="stage cursor-stage" id="curGsap">
+            <span class="hint">move inside</span>
+            <div class="follower"></div>
+          </div>
+          <p class="pane__note"><code class="inline">gsap.quickTo</code> gives a springy, frame-perfect trail with tunable easing.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeD1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeD1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS + JS</h4><pre><span class="f">.follower</span> { <span class="k">transition</span>: left .12s, top .12s; }
+
+stage.<span class="f">onmousemove</span> = (e) =&gt; {
+  dot.<span class="f">style</span>.left = e.offsetX + <span class="s">'px'</span>;
+  dot.<span class="f">style</span>.top  = e.offsetY + <span class="s">'px'</span>;
+};</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — quickTo</h4><pre><span class="k">const</span> xTo = gsap.<span class="f">quickTo</span>(dot, <span class="s">'left'</span>, { <span class="k">duration</span>: .4, <span class="k">ease</span>: <span class="s">'power3'</span> });
+<span class="k">const</span> yTo = gsap.<span class="f">quickTo</span>(dot, <span class="s">'top'</span>,  { <span class="k">duration</span>: .4, <span class="k">ease</span>: <span class="s">'power3'</span> });
+stage.<span class="f">onmousemove</span> = (e) =&gt; { <span class="f">xTo</span>(e.offsetX); <span class="f">yTo</span>(e.offsetY); };</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. CONFETTI -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Success confetti</h2>
+        <p>A celebratory burst for a completed action.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS transition</span>
+          <div class="stage" id="confCss"></div>
+          <button class="mini-btn" id="confCssBtn">🎉 Celebrate</button>
+          <p class="pane__note">JS spawns pieces, then a CSS transition flings each to a random spot.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="stage" id="confGsap"></div>
+          <button class="mini-btn" id="confGsapBtn">🎉 Celebrate</button>
+          <p class="pane__note">GSAP gives each piece arc, gravity, spin and fade — physics CSS can’t express.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeD2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeD2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>piece.<span class="f">style</span>.transition = <span class="s">'transform 1s, opacity 1s'</span>;
+<span class="f">requestAnimationFrame</span>(() =&gt; {
+  piece.<span class="f">style</span>.transform =
+    <span class="s">`translate(${rx}px, ${ry}px) rotate(${r}deg)`</span>;
+  piece.<span class="f">style</span>.opacity = 0;
+});</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">to</span>(piece, {
+  <span class="k">x</span>: rx, <span class="k">y</span>: ry, <span class="k">rotation</span>: r * 3,
+  <span class="k">opacity</span>: 0, <span class="k">duration</span>: 1 + Math.<span class="f">random</span>(),
+  <span class="k">ease</span>: <span class="s">'power2.out'</span>,   <span class="c">// arc + gravity feel</span>
+  <span class="k">onComplete</span>: () =&gt; piece.<span class="f">remove</span>()
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. MAGNETIC BUTTON -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Magnetic button</h2>
+        <p>The button leans toward your cursor as you approach.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <button class="mag-btn mag-btn--css">Hover me</button>
+          <p class="pane__note">CSS can grow on hover — but it can’t be pulled toward the pointer.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <button class="mag-btn" id="magGsap">Hover me</button>
+          <p class="pane__note">GSAP translates the button toward the cursor, then snaps back elastically.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeD3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeD3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.mag-btn:hover</span> {
+  <span class="k">transform</span>: scale(1.06);
+  <span class="k">box-shadow</span>: 0 12px 26px -10px rgba(108,140,255,.8);
+}
+<span class="c">// no pointer-following in CSS</span></pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>btn.<span class="f">onmousemove</span> = (e) =&gt; {
+  <span class="k">const</span> r = btn.<span class="f">getBoundingClientRect</span>();
+  gsap.<span class="f">to</span>(btn, { <span class="k">x</span>: (e.clientX - r.left - r.width/2) * .4,
+    <span class="k">y</span>: (e.clientY - r.top - r.height/2) * .4, <span class="k">duration</span>: .4 });
+};
+btn.<span class="f">onmouseleave</span> = () =&gt; gsap.<span class="f">to</span>(btn,
+  { <span class="k">x</span>: 0, <span class="k">y</span>: 0, <span class="k">ease</span>: <span class="s">'elastic.out(1, 0.3)'</span> });</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. EMPTY STATE -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Animated empty state</h2>
+        <p>A gentle idle motion keeps an otherwise dead screen feeling alive.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS loop</span>
+          <div class="empty empty--css">
+            <div class="glyph-box">📭</div>
+            <div class="et">No messages yet</div>
+            <div class="es">New mail will appear here.</div>
+          </div>
+          <p class="pane__note">A single CSS <code class="inline">@keyframes</code> bobs the icon up and down forever.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="empty" id="emptyGsap">
+            <div class="glyph-box">📭</div>
+            <div class="et">No messages yet</div>
+            <div class="es">New mail will appear here.</div>
+          </div>
+          <p class="pane__note">GSAP floats the icon <em>and</em> staggers the text in on load — one timeline.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeD4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeD4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.glyph-box</span> { <span class="k">animation</span>: float 2.6s ease-in-out infinite; }
+<span class="k">@keyframes</span> float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-9px); }
+}</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">from</span>([icon, title, sub],
+  { <span class="k">opacity</span>: 0, <span class="k">y</span>: 12, <span class="k">stagger</span>: .12 });   <span class="c">// entrance</span>
+
+gsap.<span class="f">to</span>(icon, { <span class="k">y</span>: -9, <span class="k">repeat</span>: -1, <span class="k">yoyo</span>: true,
+  <span class="k">duration</span>: 1.3, <span class="k">ease</span>: <span class="s">'sine.inOut'</span> });   <span class="c">// idle float</span></pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 08 of 08 · Delight</span>
+      <span><a href="cards.html">← Cards</a> &nbsp;·&nbsp; <a href="index.html">Overview</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="delight.js"></script>
+</body>
+</html>

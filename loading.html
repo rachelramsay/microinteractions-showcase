@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>04 · Loading &amp; progress — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  /* ---- Skeleton ---- */
+  .load-area { width: 250px; }
+  .skeleton { display: flex; gap: 12px; align-items: center; }
+  .sk-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; background: var(--bg-elev-2); }
+  .sk-lines { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+  .sk-line { height: 12px; border-radius: 6px; background: var(--bg-elev-2); }
+  .sk-line.short { width: 55%; }
+  .shimmer {
+    background: linear-gradient(90deg, #1c2130 0%, #2c3346 50%, #1c2130 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s linear infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  html[data-theme="light"] .shimmer { background: linear-gradient(90deg, #e4e9f2 0%, #f4f7fc 50%, #e4e9f2 100%); background-size: 200% 100%; }
+
+  .loaded { display: flex; gap: 12px; align-items: center; }
+  .ld-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  .ld-lines { flex: 1; }
+  .ld-title { font-size: 15px; font-weight: 600; }
+  .ld-sub { font-size: 13px; color: var(--text-dim); }
+
+  /* ---- Progress bar ---- */
+  .progress { width: 250px; }
+  .pg-track { height: 8px; background: var(--bg-elev-2); border-radius: 999px; overflow: hidden; }
+  .pg-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .pg-css .pg-fill { transition: width .2s linear; }
+  .pg-top { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-dim); margin-bottom: 8px; }
+
+  /* ---- Spinner ---- */
+  .spin-css { width: 38px; height: 38px; border: 4px solid var(--bg-elev-2); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin-gsap { width: 44px; height: 44px; }
+  .spin-gsap circle { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+
+  /* ---- Counter ---- */
+  .counter { font-size: 46px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; background: linear-gradient(120deg, var(--heading-from), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html" class="active"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 04</span>
+    <h1>Loading &amp; progress</h1>
+    <p class="lede">Feedback for the in-between moments — the difference between “is this broken?” and “it’s working.” Trigger each demo with its button. Plain CSS/JS on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. SKELETON -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Skeleton screen</h2>
+        <p>Shimmering placeholders stand in until the real content loads.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS shimmer</span>
+          <div class="load-area" id="skCss"></div>
+          <button class="mini-btn" id="skCssBtn">Reload</button>
+          <p class="pane__note">A CSS gradient animates its background-position for the shimmer.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="load-area" id="skGsap"></div>
+          <button class="mini-btn" id="skGsapBtn">Reload</button>
+          <p class="pane__note">GSAP cross-fades skeleton → content and staggers the lines in.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeL1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeL1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.shimmer</span> {
+  <span class="k">background</span>: linear-gradient(90deg,
+    #1c2130, #2c3346, #1c2130);
+  <span class="k">background-size</span>: 200% 100%;
+  <span class="k">animation</span>: shimmer 1.3s linear infinite;
+}
+<span class="k">@keyframes</span> shimmer {
+  <span class="k">to</span> { background-position: -200% 0; } }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">timeline</span>()
+  .<span class="f">to</span>(skeleton, { <span class="k">opacity</span>: 0, <span class="k">duration</span>: .3 })
+  .<span class="f">set</span>(skeleton, { <span class="k">display</span>: <span class="s">'none'</span> })
+  .<span class="f">from</span>(contentLines, { <span class="k">opacity</span>: 0, <span class="k">y</span>: 8,
+        <span class="k">stagger</span>: .08, <span class="k">ease</span>: <span class="s">'power2.out'</span> });</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. PROGRESS BAR -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Progress bar</h2>
+        <p>A determinate bar that fills toward 100%.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS transition</span>
+          <div class="progress">
+            <div class="pg-top"><span>Uploading…</span><span id="pgCssPct">0%</span></div>
+            <div class="pg-track"><div class="pg-fill" id="pgCssFill"></div></div>
+          </div>
+          <button class="mini-btn" id="pgCssBtn">Start</button>
+          <p class="pane__note">JS bumps the width in uneven steps; CSS smooths each jump.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="progress">
+            <div class="pg-top"><span>Uploading…</span><span id="pgGsapPct">0%</span></div>
+            <div class="pg-track"><div class="pg-fill" id="pgGsapFill"></div></div>
+          </div>
+          <button class="mini-btn" id="pgGsapBtn">Start</button>
+          <p class="pane__note">One eased tween drives both the width and the % readout via <code class="inline">onUpdate</code>.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeL2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeL2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre><span class="k">let</span> p = 0;
+<span class="k">const</span> id = <span class="f">setInterval</span>(() =&gt; {
+  p = Math.<span class="f">min</span>(100, p + Math.<span class="f">random</span>()*18);
+  fill.<span class="f">style</span>.width = p + <span class="s">'%'</span>;
+  pct.<span class="f">textContent</span> = Math.<span class="f">round</span>(p) + <span class="s">'%'</span>;
+  <span class="k">if</span> (p &gt;= 100) <span class="f">clearInterval</span>(id);
+}, 250);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="k">const</span> o = { p: 0 };
+gsap.<span class="f">to</span>(o, { <span class="k">p</span>: 100, <span class="k">duration</span>: 2.4, <span class="k">ease</span>: <span class="s">'power1.inOut'</span>,
+  <span class="k">onUpdate</span>() {
+    fill.<span class="f">style</span>.width = o.p + <span class="s">'%'</span>;
+    pct.<span class="f">textContent</span> = Math.<span class="f">round</span>(o.p) + <span class="s">'%'</span>;
+  } });</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. SPINNER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Indeterminate spinner</h2>
+        <p>For when you can’t measure progress — just show it’s working.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <div class="spin-css"></div>
+          <p class="pane__note">A bordered circle rotated at a constant speed by CSS. Zero JS.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <svg class="spin-gsap" id="spinGsap" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20"></circle></svg>
+          <p class="pane__note">GSAP spins the SVG <em>and</em> breathes the arc length — that lively “Material” feel.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeL3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeL3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.spinner</span> {
+  <span class="k">border</span>: 4px solid #1c2130;
+  <span class="k">border-top-color</span>: var(--accent);
+  <span class="k">border-radius</span>: 50%;
+  <span class="k">animation</span>: spin .8s linear infinite;
+}
+<span class="k">@keyframes</span> spin { <span class="k">to</span> { transform: rotate(360deg); } }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">to</span>(svg, { <span class="k">rotation</span>: 360, <span class="k">repeat</span>: -1,
+  <span class="k">duration</span>: 1, <span class="k">ease</span>: <span class="s">'none'</span>, <span class="k">transformOrigin</span>: <span class="s">'center'</span> });
+
+gsap.<span class="f">fromTo</span>(circle,
+  { <span class="k">strokeDasharray</span>: <span class="s">'1 200'</span>, <span class="k">strokeDashoffset</span>: 0 },
+  { <span class="k">strokeDasharray</span>: <span class="s">'90 200'</span>, <span class="k">strokeDashoffset</span>: -35,
+    <span class="k">repeat</span>: -1, <span class="k">yoyo</span>: true, <span class="k">duration</span>: .8 });</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. COUNTER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Animated number counter</h2>
+        <p>A stat that rolls up from zero — great for dashboards and landing pages.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · requestAnimationFrame</span>
+          <div class="counter" id="countCss">0</div>
+          <button class="mini-btn" id="countCssBtn">Count up</button>
+          <p class="pane__note">A hand-written rAF loop with a manual easing curve.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="counter" id="countGsap">0</div>
+          <button class="mini-btn" id="countGsapBtn">Count up</button>
+          <p class="pane__note">GSAP tweens a value with built-in easing and <code class="inline">snap</code> — one call.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeL4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeL4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre><span class="k">const</span> start = <span class="f">performance</span>.now();
+<span class="f">function</span> <span class="f">tick</span>(now) {
+  <span class="k">let</span> t = Math.<span class="f">min</span>(1, (now - start) / 1800);
+  t = 1 - Math.<span class="f">pow</span>(1 - t, 3);   <span class="c">// easeOutCubic</span>
+  el.<span class="f">textContent</span> = Math.<span class="f">round</span>(t * 2847).<span class="f">toLocaleString</span>();
+  <span class="k">if</span> (t &lt; 1) <span class="f">requestAnimationFrame</span>(tick);
+}
+<span class="f">requestAnimationFrame</span>(tick);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="k">const</span> o = { v: 0 };
+gsap.<span class="f">to</span>(o, { <span class="k">v</span>: 2847, <span class="k">duration</span>: 1.8, <span class="k">ease</span>: <span class="s">'power3.out'</span>,
+  <span class="k">snap</span>: { v: 1 },
+  <span class="k">onUpdate</span>: () =&gt; el.<span class="f">textContent</span> = o.v.<span class="f">toLocaleString</span>() });</pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 04 of 08 · Loading &amp; progress</span>
+      <span><a href="toggles.html">← Toggles</a> &nbsp;·&nbsp; <a href="index.html">Overview</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="loading.js"></script>
+</body>
+</html>

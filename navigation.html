@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>06 · Navigation — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  /* ---- Hamburger ---- */
+  .hamburger { position: relative; width: 48px; height: 48px; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 13px; cursor: pointer; }
+  .hamburger .ln { position: absolute; left: 13px; width: 22px; height: 2px; border-radius: 2px; background: var(--text); top: 50%; }
+  .hamburger .ln1 { transform: translateY(-7px); }
+  .hamburger .ln3 { transform: translateY(7px); }
+  .hamburger--css .ln { transition: transform .3s cubic-bezier(.4,.1,.2,1), opacity .2s; }
+  .hamburger--css.open .ln1 { transform: translateY(0) rotate(45deg); }
+  .hamburger--css.open .ln2 { opacity: 0; }
+  .hamburger--css.open .ln3 { transform: translateY(0) rotate(-45deg); }
+
+  /* ---- Scroll box (shared) ---- */
+  .scroll-box { width: 250px; height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; position: relative; background: var(--bg-elev); }
+  .scroll-box::-webkit-scrollbar { width: 8px; }
+  .scroll-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  .filler { padding: 14px; font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+  /* sticky header shrink */
+  .mini-header { position: sticky; top: 0; z-index: 2; background: var(--bg-elev-2); border-bottom: 1px solid var(--border); padding: 18px 14px; font-size: 18px; font-weight: 700; }
+  .mini-header--css { transition: padding .25s ease, font-size .25s ease, box-shadow .25s ease; }
+  .mini-header.shrink { padding: 9px 14px; font-size: 14px; box-shadow: 0 6px 14px -8px rgba(0,0,0,0.6); }
+
+  /* scroll progress */
+  .sbar { position: sticky; top: 0; z-index: 2; height: 4px; background: var(--bg-elev-2); }
+  .sbar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+  /* ---- Accordion ---- */
+  .acc { width: 280px; display: flex; flex-direction: column; gap: 8px; }
+  .acc-item { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-elev-2); }
+  .acc-head { width: 100%; text-align: left; background: transparent; border: none; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; padding: 13px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .acc-head .pm { color: var(--text-faint); transition: transform .3s ease; font-size: 16px; }
+  .acc-item.open .acc-head .pm { transform: rotate(45deg); }
+  .acc-body { color: var(--text-dim); font-size: 13.5px; line-height: 1.6; padding: 0 15px; }
+  /* plain: grid-rows trick */
+  .acc-panel--css { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .acc-item.open .acc-panel--css { grid-template-rows: 1fr; }
+  .acc-panel--css > .acc-wrap { overflow: hidden; }
+  .acc-wrap > .acc-body { padding-bottom: 14px; }
+  /* gsap: height auto */
+  .acc-panel--gsap { height: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html" class="active"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 06</span>
+    <h1>Navigation &amp; scroll</h1>
+    <p class="lede">How an interface responds to moving through it — menus, headers, and scroll position. Interact with each. Plain CSS/JS on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. HAMBURGER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Hamburger → X morph</h2>
+        <p>The menu icon folds into a close icon. Click it.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <div class="hamburger hamburger--css" id="hamCss"><span class="ln ln1"></span><span class="ln ln2"></span><span class="ln ln3"></span></div>
+          <p class="pane__note">An <code class="inline">.open</code> class rotates the lines via CSS transitions.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="hamburger" id="hamGsap"><span class="ln ln1"></span><span class="ln ln2"></span><span class="ln ln3"></span></div>
+          <p class="pane__note">A reversible GSAP timeline morphs the lines — play forward, reverse to undo.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeNv1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeNv1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.open .ln1</span> { <span class="k">transform</span>: translateY(0) rotate(45deg); }
+<span class="f">.open .ln2</span> { <span class="k">opacity</span>: 0; }
+<span class="f">.open .ln3</span> { <span class="k">transform</span>: translateY(0) rotate(-45deg); }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — timeline</h4><pre><span class="k">const</span> tl = gsap.<span class="f">timeline</span>({ <span class="k">paused</span>: true })
+  .<span class="f">to</span>(ln1, { <span class="k">y</span>: 0, <span class="k">rotate</span>: 45 }, 0)
+  .<span class="f">to</span>(ln2, { <span class="k">opacity</span>: 0 }, 0)
+  .<span class="f">to</span>(ln3, { <span class="k">y</span>: 0, <span class="k">rotate</span>: -45 }, 0);
+btn.<span class="f">onclick</span> = () =&gt; open ? tl.<span class="f">reverse</span>() : tl.<span class="f">play</span>();</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. STICKY SHRINK -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Sticky header shrink</h2>
+        <p>The header condenses once you scroll. Scroll inside each box.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS transition</span>
+          <div class="scroll-box" id="shrinkCss">
+            <div class="mini-header mini-header--css">Dashboard</div>
+            <div class="filler">Scroll me ↓<br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.<br><br>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</div>
+          </div>
+          <p class="pane__note">A scroll listener toggles <code class="inline">.shrink</code>; CSS animates the size.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="scroll-box" id="shrinkGsap">
+            <div class="mini-header" id="shrinkGsapHead">Dashboard</div>
+            <div class="filler">Scroll me ↓<br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.<br><br>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</div>
+          </div>
+          <p class="pane__note">GSAP tweens the padding &amp; font-size, so the shrink eases rather than steps.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeNv2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeNv2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>box.<span class="f">addEventListener</span>(<span class="s">'scroll'</span>, () =&gt; {
+  header.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'shrink'</span>, box.scrollTop &gt; 20);
+});</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>box.<span class="f">addEventListener</span>(<span class="s">'scroll'</span>, () =&gt; {
+  <span class="k">const</span> small = box.scrollTop &gt; 20;
+  gsap.<span class="f">to</span>(header, { <span class="k">paddingTop</span>: small ? 9 : 18,
+    <span class="k">fontSize</span>: small ? 14 : 18, <span class="k">duration</span>: .3 });
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. SCROLL PROGRESS -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Scroll progress bar</h2>
+        <p>A bar tracks how far through the content you are.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain</span>
+          <div class="scroll-box" id="progCss">
+            <div class="sbar"><div class="sbar-fill" id="progCssFill"></div></div>
+            <div class="filler">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br><br>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<br><br>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</div>
+          </div>
+          <p class="pane__note">JS sets the bar width directly from <code class="inline">scrollTop</code> — exact, instant.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="scroll-box" id="progGsap">
+            <div class="sbar"><div class="sbar-fill" id="progGsapFill"></div></div>
+            <div class="filler">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br><br>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<br><br>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</div>
+          </div>
+          <p class="pane__note"><code class="inline">gsap.quickTo</code> smooths the bar — it glides to catch up with the scroll.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeNv3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeNv3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>box.<span class="f">onscroll</span> = () =&gt; {
+  <span class="k">const</span> max = box.scrollHeight - box.clientHeight;
+  fill.<span class="f">style</span>.width = (box.scrollTop / max * 100) + <span class="s">'%'</span>;
+};</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — quickTo</h4><pre><span class="k">const</span> set = gsap.<span class="f">quickTo</span>(fill, <span class="s">'width'</span>,
+  { <span class="k">duration</span>: .3, <span class="k">ease</span>: <span class="s">'power3'</span> });
+box.<span class="f">onscroll</span> = () =&gt; {
+  <span class="k">const</span> max = box.scrollHeight - box.clientHeight;
+  <span class="f">set</span>((box.scrollTop / max * 100) + <span class="s">'%'</span>);
+};</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. ACCORDION -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Accordion</h2>
+        <p>A panel expands smoothly to reveal its content.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS grid-rows</span>
+          <div class="acc" id="accCss">
+            <div class="acc-item">
+              <button class="acc-head">What is a microinteraction? <span class="pm">+</span></button>
+              <div class="acc-panel--css"><div class="acc-wrap"><div class="acc-body">A small, single-purpose moment of feedback — a toggle, a like, a loading state.</div></div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Why do they matter? <span class="pm">+</span></button>
+              <div class="acc-panel--css"><div class="acc-wrap"><div class="acc-body">They make an interface feel responsive, alive, and trustworthy.</div></div></div>
+            </div>
+          </div>
+          <p class="pane__note">A CSS <code class="inline">grid-template-rows: 0fr → 1fr</code> transition — no JS height math.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="acc" id="accGsap">
+            <div class="acc-item">
+              <button class="acc-head">What is a microinteraction? <span class="pm">+</span></button>
+              <div class="acc-panel--gsap"><div class="acc-body">A small, single-purpose moment of feedback — a toggle, a like, a loading state.</div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Why do they matter? <span class="pm">+</span></button>
+              <div class="acc-panel--gsap"><div class="acc-body">They make an interface feel responsive, alive, and trustworthy.</div></div>
+            </div>
+          </div>
+          <p class="pane__note">GSAP animates <code class="inline">height: 0 → auto</code> with easing — and can stagger content in.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeNv4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeNv4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.acc-panel</span> {
+  <span class="k">display</span>: grid; <span class="k">grid-template-rows</span>: 0fr;
+  <span class="k">transition</span>: grid-template-rows .3s ease;
+}
+<span class="f">.open .acc-panel</span> { <span class="k">grid-template-rows</span>: 1fr; }
+<span class="f">.acc-panel &gt; div</span> { <span class="k">overflow</span>: hidden; }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>open
+  ? gsap.<span class="f">to</span>(panel, { <span class="k">height</span>: <span class="s">'auto'</span>, <span class="k">duration</span>: .35,
+        <span class="k">ease</span>: <span class="s">'power2.out'</span> })
+  : gsap.<span class="f">to</span>(panel, { <span class="k">height</span>: 0, <span class="k">duration</span>: .3 });</pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 06 of 08 · Navigation &amp; scroll</span>
+      <span><a href="notifications.html">← Notifications</a> &nbsp;·&nbsp; <a href="cards.html">Cards →</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="navigation.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Microinteractions Showcase</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<style>
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 32px; }
+  .card {
+    border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    text-decoration: none; color: inherit; display: block;
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--border-hover); box-shadow: var(--shadow); }
+  .card .num { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: .08em; }
+  .card h3 { margin: 8px 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--text-dim); font-size: 13.5px; }
+  .card.soon { opacity: .5; }
+  .card.soon h3::after { content: " · soon"; color: var(--text-faint); font-weight: 400; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="active"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <span class="eyebrow">A live reference</span>
+    <h1>Common web microinteractions</h1>
+    <p class="lede">Microinteractions are the small, single-purpose moments of feedback that make an interface feel responsive — a button that lifts, an input that confirms it's valid, a toast that slides in. Each demo here is built <strong>two ways</strong>: hand-rolled with plain CSS &amp; vanilla JS, and again with the <strong>GSAP</strong> animation library, so you can compare the effort and the result. Toggle “View code” on any demo to see the source.</p>
+
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP (motion library)</span>
+    </div>
+
+    <div class="cards">
+      <a class="card" href="buttons.html">
+        <span class="num">01</span><h3>Buttons &amp; clicks</h3>
+        <p>Hover lift, click ripple, async loading, copy confirmation, like burst.</p>
+      </a>
+      <a class="card" href="forms.html">
+        <span class="num">02</span><h3>Forms &amp; inputs</h3>
+        <p>Floating labels, inline validation, password strength, character counter.</p>
+      </a>
+      <a class="card" href="toggles.html"><span class="num">03</span><h3>Toggles</h3><p>Switches, animated checkboxes, star rating, segmented control.</p></a>
+      <a class="card" href="loading.html"><span class="num">04</span><h3>Loading</h3><p>Skeleton screens, progress bars, spinners, animated counters.</p></a>
+      <a class="card" href="notifications.html"><span class="num">05</span><h3>Notifications</h3><p>Toasts, badge counts, tooltips, modal dialogs.</p></a>
+      <a class="card" href="navigation.html"><span class="num">06</span><h3>Navigation</h3><p>Hamburger morph, sticky shrink, scroll progress, accordion.</p></a>
+      <a class="card" href="cards.html"><span class="num">07</span><h3>Cards</h3><p>Hover tilt, image zoom, read-more, flip card.</p></a>
+      <a class="card" href="delight.html"><span class="num">08</span><h3>Delight</h3><p>Cursor follower, confetti, magnetic button, empty state.</p></a>
+    </div>
+
+    <footer class="page">
+      <span>Microinteractions showcase · 8 categories · light &amp; dark</span>
+      <span>Start with <a href="buttons.html">Buttons &amp; clicks →</a></span>
+    </footer>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

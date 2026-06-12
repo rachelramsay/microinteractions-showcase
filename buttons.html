@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>01 · Buttons &amp; clicks — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  /* ---- Button-specific styles ---- */
+  .btn--hover-css { transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, background .18s ease; }
+  .btn--hover-css:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -8px rgba(108,140,255,0.6); background: #7e9bff; }
+  .btn--hover-css:active { transform: translateY(0) scale(.97); }
+
+  .ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255,255,255,0.5); pointer-events: none; }
+  .ripple--css { animation: ripple .6s ease-out forwards; }
+  @keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
+
+  .btn--load { min-width: 152px; }
+  .spinner { width: 17px; height: 17px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; display: inline-block; vertical-align: -3px; }
+  .spinner--css { animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn.is-success { background: var(--success); }
+
+  .copy-feedback { font-size: 13px; color: var(--success); height: 18px; }
+
+  .heart { width: 56px; height: 56px; display: grid; place-items: center; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 16px; cursor: pointer; position: relative; }
+  .heart svg { width: 26px; height: 26px; overflow: visible; }
+  .heart path { fill: var(--text-faint); transition: fill .2s ease; }
+  .heart.is-liked path { fill: var(--danger); }
+  .heart--css svg { transition: transform .25s cubic-bezier(.2,1.6,.4,1); }
+  .heart--css.is-liked svg { animation: pop .4s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .particle { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html" class="active"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 01</span>
+    <h1>Buttons &amp; clicks</h1>
+    <p class="lede">The bread-and-butter interactions. Each is built with plain CSS/JS on the left and GSAP on the right — hover, click, and tap to feel the difference, then hit <strong>View code</strong> to compare the source.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. HOVER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Hover &amp; press feedback</h2>
+        <p>Lift on hover, depress on click.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <button class="btn btn--hover-css">Hover me</button>
+          <p class="pane__note">Pure <code class="inline">:hover</code> / <code class="inline">:active</code> with a transition. Zero JS.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <button class="btn" id="hoverGsap">Hover me</button>
+          <p class="pane__note">Springy, interruptible tween — hover out mid-animation and it eases back.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="code1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="code1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.btn</span> {
+  <span class="k">transition</span>: transform .18s cubic-bezier(.2,.8,.2,1),
+              box-shadow .18s, background .18s;
+}
+<span class="f">.btn:hover</span> {
+  <span class="k">transform</span>: translateY(-3px);
+  <span class="k">box-shadow</span>: 0 12px 24px -8px rgba(108,140,255,.6);
+}
+<span class="f">.btn:active</span> { <span class="k">transform</span>: translateY(0) scale(.97); }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="f">btn</span>.<span class="f">addEventListener</span>(<span class="s">'mouseenter'</span>, () =&gt;
+  gsap.<span class="f">to</span>(btn, { <span class="k">y</span>: -4, <span class="k">scale</span>: 1.04,
+    <span class="k">duration</span>: .35, <span class="k">ease</span>: <span class="s">'back.out(2)'</span> }));
+
+<span class="f">btn</span>.<span class="f">addEventListener</span>(<span class="s">'mouseleave'</span>, () =&gt;
+  gsap.<span class="f">to</span>(btn, { <span class="k">y</span>: 0, <span class="k">scale</span>: 1,
+    <span class="k">duration</span>: .4, <span class="k">ease</span>: <span class="s">'power3.out'</span> }));</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. RIPPLE -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Click ripple</h2>
+        <p>A ripple emanates from the exact click point (Material style).</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS keyframes</span>
+          <button class="btn btn--ghost" id="rippleCss">Click anywhere</button>
+          <p class="pane__note">JS places a span at the click point; CSS keyframes scale &amp; fade it.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <button class="btn btn--ghost" id="rippleGsap">Click anywhere</button>
+          <p class="pane__note">GSAP animates scale &amp; opacity with eased control, then self-cleans.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="code2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="code2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS + CSS</h4><pre><span class="c">// place span at click, then:</span>
+span.<span class="f">classList</span>.<span class="f">add</span>(<span class="s">'ripple'</span>);
+
+<span class="c">/* CSS */</span>
+<span class="f">.ripple</span> { <span class="k">animation</span>: ripple .6s ease-out forwards; }
+<span class="k">@keyframes</span> ripple { <span class="k">to</span> {
+  transform: scale(2.6); opacity: 0; } }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">fromTo</span>(span,
+  { <span class="k">scale</span>: 0, <span class="k">opacity</span>: .55 },
+  { <span class="k">scale</span>: 2.6, <span class="k">opacity</span>: 0,
+    <span class="k">duration</span>: .7, <span class="k">ease</span>: <span class="s">'power2.out'</span>,
+    <span class="k">onComplete</span>: () =&gt; span.<span class="f">remove</span>() });</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. LOADING -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Async loading state</h2>
+        <p>Idle → spinner → success checkmark.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS spin</span>
+          <button class="btn btn--load" id="loadCss"><span class="label">Save changes</span></button>
+          <p class="pane__note">Spinner rotates via CSS; JS swaps label and toggles a success class.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <button class="btn btn--load" id="loadGsap"><span class="label">Save changes</span></button>
+          <p class="pane__note">A timeline cross-fades label ↔ spinner ↔ check — phases transition, not snap.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="code3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="code3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>label.<span class="f">innerHTML</span> = <span class="s">'&lt;span class=spinner&gt;&lt;/span&gt;'</span>;
+<span class="f">setTimeout</span>(() =&gt; {
+  btn.<span class="f">classList</span>.<span class="f">add</span>(<span class="s">'is-success'</span>);
+  label.<span class="f">textContent</span> = <span class="s">'✓ Saved'</span>;
+}, 1500);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — timeline</h4><pre>gsap.<span class="f">timeline</span>()
+  .<span class="f">to</span>(label, { <span class="k">y</span>:-8, <span class="k">opacity</span>:0, <span class="k">onComplete</span>: showSpinner })
+  .<span class="f">to</span>(label, { <span class="k">y</span>:0, <span class="k">opacity</span>:1 })
+  .<span class="f">to</span>({}, { <span class="k">duration</span>: 1.6 })   <span class="c">// "work"</span>
+  .<span class="f">to</span>(label, { <span class="k">opacity</span>:0, <span class="k">onComplete</span>: showCheck })
+  .<span class="f">to</span>(label, { <span class="k">scale</span>:1, <span class="k">ease</span>:<span class="s">'back.out(2.5)'</span> });</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. COPY -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Copy to clipboard</h2>
+        <p>Confirm success with a transient message.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain</span>
+          <button class="btn btn--ghost" id="copyCss">Copy code</button>
+          <div class="copy-feedback" id="copyCssMsg"></div>
+          <p class="pane__note">Text appears, then a CSS opacity transition fades it out.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <button class="btn btn--ghost" id="copyGsap">Copy code</button>
+          <div class="copy-feedback" id="copyGsapMsg"></div>
+          <p class="pane__note">GSAP pops “Copied!” with a bounce, holds, then slides it away.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="code4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="code4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>navigator.<span class="f">clipboard</span>.<span class="f">writeText</span>(text);
+msg.<span class="f">textContent</span> = <span class="s">'✓ Copied!'</span>;
+msg.<span class="f">style</span>.opacity = 1;
+<span class="f">setTimeout</span>(() =&gt; msg.style.opacity = 0, 1300);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>navigator.<span class="f">clipboard</span>.<span class="f">writeText</span>(text);
+gsap.<span class="f">fromTo</span>(msg, { <span class="k">y</span>:10, <span class="k">opacity</span>:0, <span class="k">scale</span>:.8 },
+  { <span class="k">y</span>:0, <span class="k">opacity</span>:1, <span class="k">scale</span>:1, <span class="k">ease</span>:<span class="s">'back.out(3)'</span> });
+gsap.<span class="f">to</span>(msg, { <span class="k">y</span>:-10, <span class="k">opacity</span>:0, <span class="k">delay</span>:1.2 });</pre></div>
+      </div>
+    </section>
+
+    <!-- 5. HEART -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>5 · Like / heart burst</h2>
+        <p>A satisfying toggle — the moment of delight.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS pop</span>
+          <div class="heart heart--css" id="heartCss">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.8-10-9.3C.3 8.3 2 4.8 5.3 4.8c2 0 3.3 1.2 4.7 3 1.4-1.8 2.7-3 4.7-3 3.3 0 5 3.5 3.3 6.9C19.5 16.2 12 21 12 21z"/></svg>
+          </div>
+          <p class="pane__note">CSS handles the colour change and a keyframe “pop”.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="heart" id="heartGsap">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.8-10-9.3C.3 8.3 2 4.8 5.3 4.8c2 0 3.3 1.2 4.7 3 1.4-1.8 2.7-3 4.7-3 3.3 0 5 3.5 3.3 6.9C19.5 16.2 12 21 12 21z"/></svg>
+          </div>
+          <p class="pane__note">GSAP springs the icon <em>and</em> fires a particle burst — hard in CSS alone.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="code5"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="code5" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.heart.is-liked path</span> { <span class="k">fill</span>: #ff6b81; }
+<span class="f">.heart.is-liked svg</span> { <span class="k">animation</span>: pop .4s; }
+<span class="k">@keyframes</span> pop {
+  40% { transform: scale(1.35); } }
+<span class="c">// no particle burst without more work</span></pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">fromTo</span>(svg, { <span class="k">scale</span>:1 },
+  { <span class="k">scale</span>:1.4, <span class="k">yoyo</span>:true, <span class="k">repeat</span>:1 });
+
+<span class="k">for</span> (<span class="k">let</span> i=0; i&lt;10; i++) {           <span class="c">// burst</span>
+  gsap.<span class="f">to</span>(particle, { <span class="k">x</span>: cos(a)*38, <span class="k">y</span>: sin(a)*38,
+    <span class="k">scale</span>:0, <span class="k">opacity</span>:0, <span class="k">onComplete</span>: remove });
+}</pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 01 of 08 · Buttons &amp; clicks</span>
+      <span><a href="index.html">← Overview</a> &nbsp;·&nbsp; <a href="forms.html">Forms &amp; inputs →</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="buttons.js"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>02 · Forms &amp; inputs — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  /* ---- Form field base ---- */
+  .field { position: relative; width: 250px; }
+  .field input {
+    width: 100%; padding: 19px 38px 7px 14px;
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    border-radius: 11px; color: var(--text); font: inherit; font-size: 15px; outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,140,255,0.18); }
+  .field label {
+    position: absolute; left: 15px; top: 14px; font-size: 15px;
+    color: var(--text-faint); pointer-events: none; transform-origin: left center;
+  }
+  /* Plain floating label via CSS only */
+  .field--css input:focus + label,
+  .field--css input:not(:placeholder-shown) + label {
+    transition: transform .18s ease, color .18s ease;
+    transform: translateY(-9px) scale(.78);
+    color: var(--accent);
+  }
+  .field--css input:focus + label { color: var(--accent); }
+
+  /* validation icon */
+  .vicon { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; opacity: 0; transition: opacity .2s; }
+  .field.valid .vicon.ok { opacity: 1; }
+  .field.invalid .vicon.bad { opacity: 1; }
+  .field.valid input { border-color: var(--success); }
+  .field.invalid input { border-color: var(--danger); }
+  .vicon.ok { color: var(--success); }
+  .vicon.bad { color: var(--danger); }
+
+  /* password strength */
+  .pw-wrap { width: 250px; }
+  .pw-bar { height: 6px; border-radius: 999px; background: var(--bg-elev-2); margin-top: 10px; overflow: hidden; }
+  .pw-fill { height: 100%; width: 0%; border-radius: 999px; background: var(--danger); transition: width .3s ease, background .3s ease; }
+  .pw-label { font-size: 12px; color: var(--text-faint); margin-top: 6px; height: 15px; }
+
+  /* char counter */
+  .cc-wrap { width: 250px; }
+  .cc-area {
+    width: 100%; min-height: 70px; resize: none;
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    border-radius: 11px; color: var(--text); font: inherit; font-size: 14px; padding: 12px 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .cc-area:focus { border-color: var(--accent); }
+  .cc-count { font-size: 12px; color: var(--text-faint); text-align: right; margin-top: 6px; display: inline-block; float: right; }
+  .cc-count.warn { color: var(--warn); }
+  .cc-count.over { color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html" class="active"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 02</span>
+    <h1>Forms &amp; inputs</h1>
+    <p class="lede">The most practical microinteractions — they live on every signup, checkout, and settings page. Type into each field to see the feedback. Plain CSS/JS on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. FLOATING LABEL -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Floating label</h2>
+        <p>The placeholder lifts into a label as you focus or type.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <div class="field field--css">
+            <input type="text" id="flCss" placeholder=" " />
+            <label for="flCss">Full name</label>
+          </div>
+          <p class="pane__note">Pure CSS using <code class="inline">:placeholder-shown</code> — no JS at all.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="field">
+            <input type="text" id="flGsap" placeholder=" " />
+            <label for="flGsap">Full name</label>
+          </div>
+          <p class="pane__note">GSAP eases the label with a spring; easy to add overshoot or colour stops.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeF1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeF1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="c">&lt;!-- placeholder=" " is the trick --&gt;</span>
+<span class="f">input:focus + label</span>,
+<span class="f">input:not(:placeholder-shown) + label</span> {
+  <span class="k">transform</span>: translateY(-9px) scale(.78);
+  <span class="k">color</span>: var(--accent);
+}</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="k">const</span> up = { <span class="k">y</span>:-9, <span class="k">scale</span>:.78, <span class="k">color</span>:<span class="s">'#6c8cff'</span> };
+input.<span class="f">addEventListener</span>(<span class="s">'focus'</span>, () =&gt;
+  gsap.<span class="f">to</span>(label, { ...up, <span class="k">ease</span>:<span class="s">'back.out(2)'</span> }));
+input.<span class="f">addEventListener</span>(<span class="s">'blur'</span>, () =&gt; {
+  <span class="k">if</span> (!input.value) gsap.<span class="f">to</span>(label, { <span class="k">y</span>:0, <span class="k">scale</span>:1 });
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. INLINE VALIDATION -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Inline validation</h2>
+        <p>Validate an email as the user types — confirm or warn instantly.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain</span>
+          <div class="field" id="valCss">
+            <input type="email" placeholder="you@example.com" />
+            <span class="vicon ok">✓</span><span class="vicon bad">✕</span>
+          </div>
+          <p class="pane__note">Toggles a valid/invalid class; CSS colours the border &amp; icon.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="field" id="valGsap">
+            <input type="email" placeholder="you@example.com" />
+            <span class="vicon ok">✓</span><span class="vicon bad">✕</span>
+          </div>
+          <p class="pane__note">Same logic, plus a quick <em>shake</em> on invalid — a tactile “try again”.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeF2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeF2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre><span class="k">const</span> ok = <span class="s">/^[^@\s]+@[^@\s]+\.[^@\s]+$/</span>.<span class="f">test</span>(v);
+field.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'valid'</span>, ok);
+field.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'invalid'</span>, !ok &amp;&amp; v);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="c">// same valid/invalid logic, plus:</span>
+<span class="k">if</span> (!ok &amp;&amp; v)
+  gsap.<span class="f">fromTo</span>(field, { <span class="k">x</span>:-6 },
+    { <span class="k">x</span>:0, <span class="k">duration</span>:.4, <span class="k">ease</span>:<span class="s">'elastic.out(1,0.3)'</span> });</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. PASSWORD STRENGTH -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Password strength meter</h2>
+        <p>A bar fills and shifts colour as the password gets stronger.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS transition</span>
+          <div class="pw-wrap">
+            <div class="field" style="width:100%">
+              <input type="password" id="pwCss" placeholder="Password" />
+            </div>
+            <div class="pw-bar"><div class="pw-fill" id="pwCssFill"></div></div>
+            <div class="pw-label" id="pwCssLabel"></div>
+          </div>
+          <p class="pane__note">JS sets width &amp; colour; a CSS transition smooths the change.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="pw-wrap">
+            <div class="field" style="width:100%">
+              <input type="password" id="pwGsap" placeholder="Password" />
+            </div>
+            <div class="pw-bar"><div class="pw-fill" id="pwGsapFill" style="transition:none"></div></div>
+            <div class="pw-label" id="pwGsapLabel"></div>
+          </div>
+          <p class="pane__note">GSAP tweens the width with eased motion and animates the colour through the spectrum.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeF3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeF3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS + CSS</h4><pre>fill.<span class="f">style</span>.width = (score/4*100) + <span class="s">'%'</span>;
+fill.<span class="f">style</span>.background = colors[score];
+
+<span class="c">/* CSS */</span>
+<span class="f">.pw-fill</span> { <span class="k">transition</span>: width .3s, background .3s; }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">to</span>(fill, {
+  <span class="k">width</span>: (score/4*100) + <span class="s">'%'</span>,
+  <span class="k">backgroundColor</span>: colors[score],
+  <span class="k">duration</span>: .4, <span class="k">ease</span>: <span class="s">'power2.out'</span>
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. CHARACTER COUNTER -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Character counter</h2>
+        <p>A live count that warns as you approach the limit (140 chars).</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain</span>
+          <div class="cc-wrap">
+            <textarea class="cc-area" id="ccCss" maxlength="160" placeholder="Write something…"></textarea>
+            <span class="cc-count" id="ccCssCount">0 / 140</span>
+          </div>
+          <p class="pane__note">Count updates on input; a CSS class recolours near the limit.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="cc-wrap">
+            <textarea class="cc-area" id="ccGsap" maxlength="160" placeholder="Write something…"></textarea>
+            <span class="cc-count" id="ccGsapCount">0 / 140</span>
+          </div>
+          <p class="pane__note">GSAP pops the counter with a scale punch each time you cross into the danger zone.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeF4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeF4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>count.<span class="f">textContent</span> = len + <span class="s">' / 140'</span>;
+count.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'warn'</span>, len &gt; 120);
+count.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'over'</span>, len &gt; 140);</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="c">// same recolour, plus a punch on entering warn zone:</span>
+<span class="k">if</span> (len &gt; 120 &amp;&amp; prev &lt;= 120)
+  gsap.<span class="f">fromTo</span>(count, { <span class="k">scale</span>:1.5 },
+    { <span class="k">scale</span>:1, <span class="k">ease</span>:<span class="s">'back.out(4)'</span> });</pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 02 of 08 · Forms &amp; inputs</span>
+      <span><a href="buttons.html">← Buttons</a> &nbsp;·&nbsp; <a href="index.html">Overview</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="forms.js"></script>
+</body>
+</html>

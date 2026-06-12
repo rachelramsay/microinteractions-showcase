@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Logs / deps (none expected, but just in case)
+node_modules/
+*.log

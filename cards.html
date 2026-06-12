@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>07 · Cards &amp; content — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  .demo-card { border-radius: 16px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+
+  /* ---- Tilt ---- */
+  .tilt-wrap { perspective: 700px; }
+  .tilt {
+    width: 190px; height: 124px; border-radius: 16px; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: flex-end; padding: 16px; font-weight: 700; font-size: 16px;
+    box-shadow: 0 12px 28px -12px rgba(0,0,0,0.6);
+  }
+  .tilt--css { transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease; }
+  .tilt--css:hover { transform: translateY(-7px) scale(1.03); box-shadow: 0 20px 38px -14px rgba(108,140,255,0.7); }
+
+  /* ---- Image zoom ---- */
+  .zoom { position: relative; width: 200px; height: 132px; border-radius: 16px; overflow: hidden; cursor: pointer; }
+  .zoom .img { position: absolute; inset: 0; background: linear-gradient(135deg, #ff6b81, #b06cff 50%, #6c8cff); }
+  .zoom .img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 30%, rgba(255,255,255,0.35), transparent 45%); }
+  .zoom--css .img { transition: transform .4s ease; }
+  .zoom--css:hover .img { transform: scale(1.14); }
+  .zoom .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px; color: #fff; font-weight: 600; font-size: 14px; background: linear-gradient(transparent, rgba(0,0,0,0.55)); z-index: 1; }
+  .zoom .cap-gsap { transform: translateY(8px); opacity: 0; }
+
+  /* ---- Read more ---- */
+  .rm { width: 280px; border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--bg-elev-2); }
+  .rm-lead { font-size: 13.5px; color: var(--text); line-height: 1.6; margin: 0; }
+  .rm-extra { color: var(--text-dim); font-size: 13.5px; line-height: 1.6; }
+  .rm-extra--css { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .rm.open .rm-extra--css { grid-template-rows: 1fr; }
+  .rm-extra--css > div { overflow: hidden; }
+  .rm-extra--gsap { height: 0; overflow: hidden; }
+  .rm-extra p { margin: 12px 0 0; }
+  .rm-btn { margin-top: 12px; background: none; border: none; color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; }
+
+  /* ---- Flip ---- */
+  .flip-wrap { perspective: 900px; }
+  .flip { position: relative; width: 190px; height: 124px; transform-style: preserve-3d; }
+  .flip .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 16px; display: grid; place-items: center; padding: 16px; text-align: center; font-weight: 600; }
+  .flip .front { background: var(--bg-elev-2); border: 1px solid var(--border); color: var(--text); }
+  .flip .back { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; transform: rotateY(180deg); font-size: 14px; line-height: 1.5; }
+  .flip--css { transition: transform .55s cubic-bezier(.4,.1,.2,1); }
+  .flip--css.flipped { transform: rotateY(180deg); }
+  .flip-hint { font-size: 12px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html" class="active"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 07</span>
+    <h1>Cards &amp; content</h1>
+    <p class="lede">The interactions that make content feel touchable — tilt, zoom, expand, flip. Hover and click each one. Plain CSS/JS on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. TILT -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · Hover lift &amp; tilt</h2>
+        <p>The card responds to the pointer. Move your mouse over each.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <div class="tilt-wrap"><div class="tilt tilt--css">Lift on hover</div></div>
+          <p class="pane__note">CSS can lift &amp; scale on <code class="inline">:hover</code> — but it can’t follow the cursor.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="tilt-wrap"><div class="tilt" id="tiltGsap">3D tilt</div></div>
+          <p class="pane__note">GSAP reads the pointer position and tilts the card in 3D toward it.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeC1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeC1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.tilt:hover</span> {
+  <span class="k">transform</span>: translateY(-7px) scale(1.03);
+  <span class="k">box-shadow</span>: 0 20px 38px -14px rgba(108,140,255,.7);
+}
+<span class="c">// pointer-tracking tilt isn't possible in CSS</span></pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>card.<span class="f">addEventListener</span>(<span class="s">'mousemove'</span>, (e) =&gt; {
+  <span class="k">const</span> r = card.<span class="f">getBoundingClientRect</span>();
+  <span class="k">const</span> px = (e.clientX - r.left) / r.width - .5;
+  <span class="k">const</span> py = (e.clientY - r.top) / r.height - .5;
+  gsap.<span class="f">to</span>(card, { <span class="k">rotationY</span>: px * 22,
+    <span class="k">rotationX</span>: -py * 22, <span class="k">duration</span>: .4 });
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. IMAGE ZOOM -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Image zoom on hover</h2>
+        <p>The image scales within its frame — a classic gallery effect.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <div class="zoom zoom--css">
+            <div class="img"></div>
+            <div class="cap">Sunset Ridge</div>
+          </div>
+          <p class="pane__note">Overflow-hidden frame + a <code class="inline">scale()</code> transition on hover.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="zoom" id="zoomGsap">
+            <div class="img" id="zoomGsapImg"></div>
+            <div class="cap cap-gsap" id="zoomGsapCap">Sunset Ridge</div>
+          </div>
+          <p class="pane__note">GSAP eases the zoom and slides the caption up at the same time.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeC2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeC2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.zoom</span> { <span class="k">overflow</span>: hidden; }
+<span class="f">.zoom .img</span> { <span class="k">transition</span>: transform .4s ease; }
+<span class="f">.zoom:hover .img</span> { <span class="k">transform</span>: scale(1.14); }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>zoom.<span class="f">addEventListener</span>(<span class="s">'mouseenter'</span>, () =&gt; {
+  gsap.<span class="f">to</span>(img, { <span class="k">scale</span>: 1.14, <span class="k">duration</span>: .5 });
+  gsap.<span class="f">to</span>(cap, { <span class="k">y</span>: 0, <span class="k">opacity</span>: 1, <span class="k">duration</span>: .4 });
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. READ MORE -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Expandable “read more”</h2>
+        <p>Extra content unfolds in place when requested.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS grid-rows</span>
+          <div class="rm" id="rmCss">
+            <p class="rm-lead">Microinteractions are the small details that define how an interface feels.</p>
+            <div class="rm-extra rm-extra--css"><div><p>They guide attention, confirm actions, and add personality — turning a static page into something that responds to you.</p></div></div>
+            <button class="rm-btn" data-rm>Read more ↓</button>
+          </div>
+          <p class="pane__note">The hidden block animates from <code class="inline">0fr</code> to <code class="inline">1fr</code> — no height math.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="rm" id="rmGsap">
+            <p class="rm-lead">Microinteractions are the small details that define how an interface feels.</p>
+            <div class="rm-extra--gsap"><div class="rm-extra"><p>They guide attention, confirm actions, and add personality — turning a static page into something that responds to you.</p></div></div>
+            <button class="rm-btn" data-rm>Read more ↓</button>
+          </div>
+          <p class="pane__note">GSAP animates <code class="inline">height: 0 → auto</code> and fades the text in together.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeC3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeC3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.rm-extra</span> { <span class="k">display</span>: grid;
+  <span class="k">grid-template-rows</span>: 0fr;
+  <span class="k">transition</span>: grid-template-rows .35s; }
+<span class="f">.rm.open .rm-extra</span> { <span class="k">grid-template-rows</span>: 1fr; }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre><span class="k">const</span> open = card.<span class="f">classList</span>.<span class="f">toggle</span>(<span class="s">'open'</span>);
+gsap.<span class="f">to</span>(extra, { <span class="k">height</span>: open ? <span class="s">'auto'</span> : 0,
+  <span class="k">opacity</span>: open ? 1 : 0, <span class="k">duration</span>: .35,
+  <span class="k">ease</span>: <span class="s">'power2.out'</span> });</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. FLIP -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Flip card</h2>
+        <p>The card turns over to reveal its back. Click to flip.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS 3D</span>
+          <div class="flip-wrap"><div class="flip flip--css" id="flipCss">
+            <div class="face front">Tap to flip</div>
+            <div class="face back">$24/mo · Pro plan</div>
+          </div></div>
+          <span class="flip-hint">click the card</span>
+          <p class="pane__note">A CSS <code class="inline">rotateY(180deg)</code> transition on a 3D-preserved card.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="flip-wrap"><div class="flip" id="flipGsap">
+            <div class="face front">Tap to flip</div>
+            <div class="face back">$24/mo · Pro plan</div>
+          </div></div>
+          <span class="flip-hint">click the card</span>
+          <p class="pane__note">GSAP tweens <code class="inline">rotationY</code> with easing — add a scale dip for a “lift” feel.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeC4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeC4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.flip</span> { <span class="k">transform-style</span>: preserve-3d;
+  <span class="k">transition</span>: transform .55s; }
+<span class="f">.flip.flipped</span> { <span class="k">transform</span>: rotateY(180deg); }
+<span class="f">.back</span> { <span class="k">transform</span>: rotateY(180deg);
+  <span class="k">backface-visibility</span>: hidden; }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>flipped = !flipped;
+gsap.<span class="f">to</span>(card, { <span class="k">rotationY</span>: flipped ? 180 : 0,
+  <span class="k">duration</span>: .6, <span class="k">ease</span>: <span class="s">'power2.inOut'</span> });
+<span class="c">// card has transformStyle: preserve-3d</span></pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 07 of 08 · Cards &amp; content</span>
+      <span><a href="navigation.html">← Navigation</a> &nbsp;·&nbsp; <a href="delight.html">Delight →</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="cards.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>03 · Toggles &amp; selection — Microinteractions</title>
+<link rel="stylesheet" href="styles.css" />
+<script>try{var t=localStorage.getItem('mi-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  /* ---- Switch ---- */
+  .switch--css { position: relative; display: inline-block; width: 54px; height: 30px; cursor: pointer; }
+  .switch--css input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch--css .track {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    transition: background .25s ease, border-color .25s ease;
+  }
+  .switch--css .track::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;
+    border-radius: 50%; background: #fff;
+    transition: transform .28s cubic-bezier(.2,.8,.3,1.4);
+  }
+  .switch--css input:checked + .track { background: var(--accent); border-color: var(--accent); }
+  .switch--css input:checked + .track::after { transform: translateX(24px); }
+
+  .switch--gsap {
+    position: relative; width: 54px; height: 30px; border-radius: 999px;
+    background: var(--bg-elev-2); border: 1px solid var(--border); cursor: pointer;
+    transition: background .25s ease, border-color .25s ease;
+  }
+  .switch--gsap.on { background: var(--accent); border-color: var(--accent); }
+  .switch--gsap .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; }
+
+  /* ---- Checkbox draw-in ---- */
+  .check { position: relative; display: inline-flex; align-items: center; gap: 11px; cursor: pointer; font-size: 15px; color: var(--text-dim); user-select: none; }
+  .check input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check .box {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--bg-elev-2); border: 1.5px solid var(--border);
+    display: grid; place-items: center;
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .check .box svg { width: 16px; height: 16px; }
+  .check .box path { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; }
+  .check--css input:checked + .box,
+  #checkGsap input:checked + .box { background: var(--success); border-color: var(--success); }
+  .check--css input:checked + .box path { transition: stroke-dashoffset .3s ease .05s; stroke-dashoffset: 0; }
+
+  /* ---- Star rating ---- */
+  .stars { display: inline-flex; gap: 6px; }
+  .stars span { font-size: 30px; line-height: 1; color: var(--text-faint); cursor: pointer; transition: color .15s ease; }
+  .stars span.lit { color: var(--warn); }
+  .rate-label { font-size: 12.5px; color: var(--text-faint); height: 15px; margin-top: 4px; }
+
+  /* ---- Segmented control ---- */
+  .seg { position: relative; display: inline-flex; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 11px; padding: 4px; }
+  .seg button { position: relative; z-index: 1; appearance: none; background: transparent; border: none; color: var(--text-dim); font: inherit; font-size: 14px; font-weight: 500; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: color .2s ease; }
+  .seg button.active { color: #fff; }
+  .seg-ind { position: absolute; top: 4px; left: 4px; height: calc(100% - 8px); border-radius: 8px; background: var(--accent); z-index: 0; }
+  .seg--css .seg-ind { transition: transform .3s cubic-bezier(.3,.9,.3,1.2), width .3s ease; }
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn">☰ Menu</button>
+  <div class="scrim" hidden></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="glyph">μ</span>
+      <span><b>Microinteractions</b><small>Plain CSS vs GSAP</small></span>
+    </div>
+    <nav class="nav">
+      <a href="index.html"><span class="num">★</span> Overview</a>
+      <div class="nav-group-label">Categories</div>
+      <a href="buttons.html"><span class="num">01</span> Buttons &amp; clicks</a>
+      <a href="forms.html"><span class="num">02</span> Forms &amp; inputs</a>
+      <a href="toggles.html" class="active"><span class="num">03</span> Toggles</a>
+      <a href="loading.html"><span class="num">04</span> Loading</a>
+      <a href="notifications.html"><span class="num">05</span> Notifications</a>
+      <a href="navigation.html"><span class="num">06</span> Navigation</a>
+      <a href="cards.html"><span class="num">07</span> Cards</a>
+      <a href="delight.html"><span class="num">08</span> Delight</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Category 03</span>
+    <h1>Toggles &amp; selection</h1>
+    <p class="lede">Controls that flip state — and reward the flip with a little motion. Click each one. Plain CSS/JS on the left, GSAP on the right.</p>
+    <div class="legend">
+      <span><span class="dot plain"></span> Plain CSS / vanilla JS</span>
+      <span><span class="dot gsap"></span> GSAP</span>
+    </div>
+
+    <!-- 1. SWITCH -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>1 · On / off switch</h2>
+        <p>The knob slides across as the track fills with colour.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <label class="switch--css">
+            <input type="checkbox" />
+            <span class="track"></span>
+          </label>
+          <p class="pane__note">A hidden checkbox + <code class="inline">:checked</code> sibling selector. Zero JS.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="switch--gsap" id="switchGsap" role="switch" aria-checked="false" tabindex="0">
+            <span class="knob"></span>
+          </div>
+          <p class="pane__note">GSAP eases the knob with overshoot — easy to add a bounce or squash.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeT1"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeT1" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.track::after</span> { <span class="c">/* the knob */</span>
+  <span class="k">transition</span>: transform .28s cubic-bezier(.2,.8,.3,1.4);
+}
+<span class="f">input:checked + .track</span> { <span class="k">background</span>: var(--accent); }
+<span class="f">input:checked + .track::after</span> {
+  <span class="k">transform</span>: translateX(24px);
+}</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>sw.<span class="f">addEventListener</span>(<span class="s">'click'</span>, () =&gt; {
+  on = !on;
+  gsap.<span class="f">to</span>(knob, { <span class="k">x</span>: on ? 24 : 0,
+    <span class="k">duration</span>: .35, <span class="k">ease</span>: <span class="s">'back.out(2)'</span> });
+  gsap.<span class="f">to</span>(sw, { <span class="k">backgroundColor</span>: on ? <span class="s">'#6c8cff'</span> : <span class="s">'#1c2130'</span> });
+});</pre></div>
+      </div>
+    </section>
+
+    <!-- 2. CHECKBOX -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>2 · Animated checkbox</h2>
+        <p>The checkmark draws itself in stroke by stroke.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS only</span>
+          <label class="check check--css">
+            <input type="checkbox" />
+            <span class="box"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+            Subscribe
+          </label>
+          <p class="pane__note">An SVG path with <code class="inline">stroke-dashoffset</code> animated on <code class="inline">:checked</code>.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <label class="check" id="checkGsap">
+            <input type="checkbox" />
+            <span class="box"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+            Subscribe
+          </label>
+          <p class="pane__note">GSAP draws the stroke <em>and</em> pops the box — sequenced on a timeline.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeT2"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeT2" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — CSS</h4><pre><span class="f">.box path</span> {
+  <span class="k">stroke-dasharray</span>: 24;
+  <span class="k">stroke-dashoffset</span>: 24;   <span class="c">/* hidden */</span>
+}
+<span class="f">input:checked + .box path</span> {
+  <span class="k">transition</span>: stroke-dashoffset .3s ease;
+  <span class="k">stroke-dashoffset</span>: 0;     <span class="c">/* drawn */</span>
+}</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — timeline</h4><pre>gsap.<span class="f">timeline</span>()
+  .<span class="f">to</span>(box, { <span class="k">scale</span>: .85, <span class="k">duration</span>: .1 })
+  .<span class="f">to</span>(box, { <span class="k">scale</span>: 1, <span class="k">ease</span>: <span class="s">'back.out(3)'</span> })
+  .<span class="f">to</span>(path, { <span class="k">strokeDashoffset</span>: 0,
+        <span class="k">duration</span>: .3 }, <span class="s">'&lt;'</span>);</pre></div>
+      </div>
+    </section>
+
+    <!-- 3. STAR RATING -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>3 · Star rating</h2>
+        <p>Hover to preview, click to set. The everyday review control.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain</span>
+          <div class="stars" id="starsCss" data-label="rateCssLabel">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <div class="rate-label" id="rateCssLabel">Rate it</div>
+          <p class="pane__note">JS lights stars on hover/click; CSS transitions the colour.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="stars" id="starsGsap" data-label="rateGsapLabel">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <div class="rate-label" id="rateGsapLabel">Rate it</div>
+          <p class="pane__note">On click, GSAP pops the selected stars with a staggered bounce.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeT3"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeT3" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS</h4><pre>stars.<span class="f">forEach</span>((s, i) =&gt; {
+  s.<span class="f">onmouseenter</span> = () =&gt; light(i);
+  s.<span class="f">onclick</span>      = () =&gt; { rating = i; light(i); };
+});
+<span class="c">// light(): toggle .lit on stars 0..i</span></pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>s.<span class="f">onclick</span> = () =&gt; {
+  rating = i; light(i);
+  gsap.<span class="f">fromTo</span>(stars.<span class="f">slice</span>(0, i+1),
+    { <span class="k">scale</span>: .5 },
+    { <span class="k">scale</span>: 1, <span class="k">stagger</span>: .06, <span class="k">ease</span>: <span class="s">'back.out(4)'</span> });
+};</pre></div>
+      </div>
+    </section>
+
+    <!-- 4. SEGMENTED CONTROL -->
+    <section class="demo">
+      <div class="demo__head">
+        <h2>4 · Segmented control</h2>
+        <p>A sliding indicator glides to the chosen option.</p>
+      </div>
+      <div class="demo__grid">
+        <div class="pane">
+          <span class="pane__tag"><span class="dot plain"></span>Plain · CSS transition</span>
+          <div class="seg seg--css" id="segCss">
+            <span class="seg-ind"></span>
+            <button class="active">Day</button><button>Week</button><button>Month</button>
+          </div>
+          <p class="pane__note">JS moves the indicator; a CSS transition smooths the slide.</p>
+        </div>
+        <div class="pane">
+          <span class="pane__tag"><span class="dot gsap"></span>GSAP</span>
+          <div class="seg" id="segGsap">
+            <span class="seg-ind"></span>
+            <button class="active">Day</button><button>Week</button><button>Month</button>
+          </div>
+          <p class="pane__note">GSAP slides the indicator with an elastic settle — it overshoots, then lands.</p>
+        </div>
+      </div>
+      <div class="demo__foot">
+        <button class="code-toggle" aria-expanded="false" aria-controls="codeT4"><span class="chev">▶</span> <span class="txt">View code</span></button>
+      </div>
+      <div class="code-panel" id="codeT4" hidden>
+        <div class="code-col"><h4><span class="dot plain"></span>Plain — JS + CSS</h4><pre>ind.<span class="f">style</span>.width = btn.offsetWidth + <span class="s">'px'</span>;
+ind.<span class="f">style</span>.transform = <span class="s">`translateX(${btn.offsetLeft - 4}px)`</span>;
+
+<span class="c">/* CSS */</span>
+<span class="f">.seg-ind</span> { <span class="k">transition</span>: transform .3s, width .3s; }</pre></div>
+        <div class="code-col"><h4><span class="dot gsap"></span>GSAP — JS</h4><pre>gsap.<span class="f">to</span>(ind, {
+  <span class="k">width</span>: btn.offsetWidth,
+  <span class="k">x</span>: btn.offsetLeft - 4,
+  <span class="k">duration</span>: .5, <span class="k">ease</span>: <span class="s">'elastic.out(1, 0.6)'</span>
+});</pre></div>
+      </div>
+    </section>
+
+    <footer class="page">
+      <span>Category 03 of 08 · Toggles &amp; selection</span>
+      <span><a href="forms.html">← Forms</a> &nbsp;·&nbsp; <a href="index.html">Overview</a></span>
+    </footer>
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="toggles.js"></script>
+</body>
+</html>
