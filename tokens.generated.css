@@ -1,0 +1,65 @@
+/* ============================================================
+   tokens.generated.css
+   AUTO-GENERATED from the Figma "Microinteractions — Design System"
+   variable collections (Color · Radius · Spacing).
+   Do not edit by hand — change tokens in Figma and re-export.
+
+   Note: --shadow / --sidebar-bg are effect/translucency styles in
+   Figma and remain in styles.css (not part of the variable export).
+   ============================================================ */
+
+:root {
+  /* Color · Dark mode */
+  --bg: #0c0e14;
+  --bg-elev: #141823;
+  --bg-elev-2: #1c2130;
+  --border: #262c3d;
+  --border-hover: #34405c;
+  --text: #e7eaf3;
+  --text-dim: #9aa3b8;
+  --text-faint: #5d6479;
+  --accent: #6c8cff;
+  --accent-2: #b06cff;
+  --success: #36d399;
+  --danger: #ff6b81;
+  --warn: #ffd166;
+  --code-text: #cdd4e6;
+  --heading-from: #ffffff;
+  --syntax-str: #36d399;
+  --syntax-fn: #6c8cff;
+
+  /* Radius */
+  --radius: 14px;
+
+  /* Spacing scale */
+  --space-3xs: 4px;
+  --space-2xs: 6px;
+  --space-xs: 8px;
+  --space-sm: 10px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+}
+
+html[data-theme="light"] {
+  /* Color · Light mode */
+  --bg: #f4f6fb;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #eaeef6;
+  --border: #dce1ec;
+  --border-hover: #c2c9d8;
+  --text: #1a1f2e;
+  --text-dim: #54607a;
+  --text-faint: #8b94a9;
+  --accent: #4f6dff;
+  --accent-2: #9a55ff;
+  --success: #15a86b;
+  --danger: #e23b54;
+  --warn: #c98a00;
+  --code-text: #2b3245;
+  --heading-from: #161b29;
+  --syntax-str: #0a9d63;
+  --syntax-fn: #3a5bff;
+}
